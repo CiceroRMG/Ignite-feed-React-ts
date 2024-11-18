@@ -11,23 +11,28 @@ interface Author {
     avatarUrl: string
 }
 
-interface Line {
-    type: string
+interface Content {
+    type: 'paragraph' | 'link'
     content: string
 }
 
-interface PostProps {
+export interface PostType {
+    id: number
     author: Author
-    contents: Line[]
+    contents: Content[]
     postedAt: { date: Date }
 }
 
-export function Post({ author, contents, postedAt }: PostProps) {
-    const publishedDateFormatted = format(postedAt.date, "d 'de' LLLL 'às' HH:mm'h'", {
+interface PostProps {
+    props: PostType
+}
+
+export function Post({ props }: PostProps) {
+    const publishedDateFormatted = format(props.postedAt.date, "d 'de' LLLL 'às' HH:mm'h'", {
         locale: ptBR,
     })
 
-    const publishedDateRelativeToNow = formatDistanceToNow(postedAt.date, {
+    const publishedDateRelativeToNow = formatDistanceToNow(props.postedAt.date, {
         locale: ptBR,
         addSuffix: true,
     })
@@ -67,20 +72,20 @@ export function Post({ author, contents, postedAt }: PostProps) {
         <article className={styles.post}>
             <header>
                 <div className={styles.author}>
-                    <Avatar src={author.avatarUrl} />
+                    <Avatar src={props.author.avatarUrl} />
                     <div className={styles.authorInfo}>
-                        <strong>{author.name}</strong>
-                        <span>{author.role}</span>
+                        <strong>{props.author.name}</strong>
+                        <span>{props.author.role}</span>
                     </div>
                 </div>
 
-                <time title={publishedDateFormatted} dateTime={postedAt.date.toISOString()}>
+                <time title={publishedDateFormatted} dateTime={props.postedAt.date.toISOString()}>
                     {publishedDateRelativeToNow}
                 </time>
             </header>
 
             <div className={styles.content}>
-                {contents.map( (line) => {
+                {props.contents.map( (line) => {
                     if (line.type === "paragraph") {
                         return <p key={line.content}>{line.content}</p>
                     } else {
